@@ -1,0 +1,23 @@
+
+# 1. Introduction
+
+In educational settings, lecture texts are often designed to present knowledge in a logically progressive manner. Topics are introduced sequentially, terminology is gradually expanded, and explanations are expected to accumulate toward deeper understanding. Nevertheless, students frequently experience sudden breakdowns in comprehension: a lecture appears coherent and continuous, yet at a certain point it becomes difficult to follow. Importantly, such breakdowns often occur without an explicit topic shift or abrupt stylistic change.
+
+This phenomenon suggests that failures of understanding are not always caused by changes in *what* is being discussed, but rather by changes in *what is implicitly assumed*. In many lectures, new prerequisite knowledge is introduced implicitly—without being explicitly explained—under the assumption that learners already possess it. When this assumption does not hold, comprehension deteriorates despite surface-level textual continuity.
+
+Prior research in educational technology and discourse analysis has extensively examined topic transitions, lexical complexity, and readability metrics. Similarly, recent advances in natural language processing have leveraged embedding models to quantify semantic similarity between textual units, enabling applications such as topic segmentation, coherence evaluation, and difficulty estimation. However, these approaches primarily focus on *similarity* and *continuity* in expressed content. They are not designed to capture what is *missing*: the unspoken background knowledge required to understand a given passage.
+
+As a result, an important aspect of instructional communication remains largely unmeasured—namely, the accumulation and transformation of implicit prerequisites over time. Even when adjacent lecture segments are semantically similar in embedding space, the set of knowledge elements required for comprehension may change substantially. This disconnect between expressed content and required prior knowledge is a central yet underexplored cause of comprehension failure.
+
+In this paper, we propose a new framework for analyzing lecture texts based on **Unspoken Context Change**: the temporal variation of implicit prerequisite knowledge that is required but not explicitly stated. Rather than using embeddings solely to measure semantic proximity, we reinterpret them as tools for detecting *conceptual gaps* between what has been explained and what is being assumed.
+
+Specifically, we introduce a set of gap-based metrics computed over sliding windows of sentence-level embeddings. These metrics distinguish (i) topic continuity, (ii) the emergence of domain-specific terminology, and (iii) the growth of implicit prerequisite knowledge. We further formalize the notion of **Context Debt**, which represents the cumulative amount of unspoken assumptions embedded in a lecture at a given point. Sudden increases in this debt correspond to moments where the instructional burden shifts from explicit explanation to implicit expectation.
+
+By focusing on what is *required but unspoken*, our approach complements existing similarity-based analyses and offers a new perspective on instructional clarity. While this study is motivated by lecture texts, the proposed framework is general and applicable to a wide range of explanatory documents, including textbooks, technical manuals, and AI-generated educational content.
+
+The contributions of this paper are threefold:
+
+1. We introduce a formal definition of *Unspoken Context* and its temporal change in instructional texts.
+2. We propose embedding-based gap metrics that quantify implicit prerequisite shifts independently of topic similarity.
+3. We demonstrate, through a case study on lecture texts, how these metrics reveal comprehension-critical points that are not captured by conventional semantic similarity measures.
+

@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UCC Detection Viewer</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica', 'Arial', sans-serif;
+            background: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+
+        .subtitle {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+
+        .upload-section {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        input[type="text"],
+        input[type="file"],
+        input[type="number"],
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        button {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background: #2980b9;
+        }
+
+        button:disabled {
+            background: #95a5a6;
+            cursor: not-allowed;
+        }
+
+        .results-section {
+            display: none;
+        }
+
+        .stats {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 15px;
+            background: #ecf0f1;
+            border-radius: 4px;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #3498db;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #7f8c8d;
+            margin-top: 5px;
+        }
+
+        .chart-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            height: 400px;
+        }
+
+        .controls {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .threshold-control {
+            margin-top: 10px;
+        }
+
+        .threshold-value {
+            display: inline-block;
+            margin-left: 10px;
+            font-weight: bold;
+            color: #3498db;
+        }
+
+        .segments-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .segment {
+            padding: 15px;
+            margin-bottom: 10px;
+            border-left: 4px solid #ecf0f1;
+            background: #fafafa;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .segment:hover {
+            background: #f0f0f0;
+            transform: translateX(5px);
+        }
+
+        .segment.marked {
+            border-left-color: #e74c3c;
+            background: #fff5f5;
+        }
+
+        .segment-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .segment-time {
+            font-size: 12px;
+            color: #95a5a6;
+            font-family: monospace;
+        }
+
+        .segment-score {
+            font-size: 12px;
+            font-weight: bold;
+            padding: 3px 8px;
+            border-radius: 3px;
+            background: #ecf0f1;
+        }
+
+        .segment-score.high {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .segment-text {
+            font-size: 14px;
+            color: #2c3e50;
+            line-height: 1.5;
+        }
+
+        .segment-details {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #ecf0f1;
+            font-size: 12px;
+            color: #7f8c8d;
+            display: none;
+        }
+
+        .segment.active .segment-details {
+            display: block;
+        }
+
+        .reasons {
+            margin-top: 8px;
+        }
+
+        .reason-tag {
+            display: inline-block;
+            background: #3498db;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 3px;
+            margin-right: 5px;
+            margin-bottom: 5px;
+            font-size: 11px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #7f8c8d;
+        }
+
+        .error {
+            background: #e74c3c;
+            color: white;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+
+        .warning {
+            background: #f39c12;
+            color: white;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Unspoken Context Detection Viewer</h1>
+            <p class="subtitle">Detect implicit prerequisite shifts in lecture transcripts</p>
+        </header>
+
+        <div class="upload-section">
+            <h2>Upload Subtitle File</h2>
+            <form id="uploadForm">
+                <div class="form-group">
+                    <label for="videoId">Video ID</label>
+                    <input type="text" id="videoId" name="videoId" required placeholder="e.g., lecture_001">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="language">Language</label>
+                        <select id="language" name="language">
+                            <option value="ja">Japanese (ja)</option>
+                            <option value="en">English (en)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="k_minus">Past Window (k_minus)</label>
+                        <input type="number" id="k_minus" name="k_minus" value="12" min="1" title="How far back to look for context">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="k_plus">Current Window (k_plus)</label>
+                        <input type="number" id="k_plus" name="k_plus" value="3" min="1" title="Forward-looking window size">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="lambda">Lambda (λ)</label>
+                        <input type="number" id="lambda" name="lambda" value="1.5" step="0.1" min="0">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="file">Subtitle File (.vtt or .srt)</label>
+                    <input type="file" id="file" name="file" accept=".vtt,.srt" required>
+                </div>
+
+                <button type="submit" id="submitBtn">Analyze</button>
+            </form>
+        </div>
+
+        <div class="results-section" id="resultsSection">
+            <div class="stats">
+                <h2>Analysis Results</h2>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-value" id="totalSegments">-</div>
+                        <div class="stat-label">Total Segments</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="markedCount">-</div>
+                        <div class="stat-label">Marked Segments</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="markedPercent">-</div>
+                        <div class="stat-label">Marked %</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="threshold">-</div>
+                        <div class="stat-label">Threshold (ΔD)</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="kMinus">-</div>
+                        <div class="stat-label">Past Window (k_minus)</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="kPlus">-</div>
+                        <div class="stat-label">Current Window (k_plus)</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="chart-container">
+                <canvas id="contextChart"></canvas>
+            </div>
+
+            <div class="controls">
+                <h3>Filter Controls</h3>
+                <div class="threshold-control">
+                    <label for="scoreThreshold">
+                        UCC Score Threshold:
+                        <span class="threshold-value" id="thresholdValue">0.00</span>
+                    </label>
+                    <input type="range" id="scoreThreshold" min="0" max="1" step="0.01" value="0" style="width: 100%">
+                </div>
+            </div>
+
+            <div class="segments-container">
+                <h2>Segments</h2>
+                <div id="segmentsList"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/viewer.js?v=8"></script>
+</body>
+</html>
