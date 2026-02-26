@@ -1,4 +1,3 @@
-````markdown
 # SPEC.md — Unspoken Context Change Detection (YouTube Transcript Marking System)
 
 **Goal:** Build an experimental system that takes YouTube lecture video transcripts (subtitle-equivalent text) and performs **Unspoken Context Change (UCC) Detection**, then **marks** subtitle segments where **implicit prerequisite shifts / missing prerequisite information** are likely.
@@ -523,6 +522,3 @@ Nice-to-have:
 * Evaluation hooks: export candidate indices for annotation tooling
 
 ---
-
-```
-```
