@@ -1,4 +1,3 @@
-````markdown
 ## Appendix B — LLM-Direct UCC Detection (No Embeddings) for YouTube Subtitle Segments
 
 This appendix specifies an **LLM-direct** Unspoken Context Change (UCC) detector that operates on **YouTube subtitle segments** (VTT/SRT normalized to segments) **without embeddings**.  
@@ -270,7 +269,3 @@ Cache each chunk request/response:
 6. Integrate into core export pipeline (`result.json`, optional `viewer.html`)
 
 ---
-
-```
-::contentReference[oaicite:0]{index=0}
-```
