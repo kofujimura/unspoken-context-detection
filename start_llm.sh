@@ -7,4 +7,4 @@ echo ""
 echo "Note: This mode uses LLM API calls and may take longer to process."
 echo ""
 
-uvicorn backend_llm.main:app --reload --port 8001
+LLM_MODEL=gpt-5.2 uvicorn backend_llm.main:app --reload --port 8001

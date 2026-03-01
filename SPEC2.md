@@ -73,6 +73,14 @@ The LLM processes segments in **chunks** (windows), each chunk includes:
 > * “Missing prerequisite” must be a concrete concept/assumption (avoid vague labels like “more detail”).
 > * A “change point” is the FIRST segment where the new prerequisite becomes required.
 >
+> Severity guide (integer 1-5):
+> * 1 — Minor gap: an unfamiliar term or single concept; a non-expert can still follow the overall flow.
+> * 2 — Moderate gap: a missing concept causes noticeable confusion, but the gist of the section can still be inferred.
+> * 3 — Significant gap: the missing prerequisite is necessary to understand WHY the conclusion or next step holds; without it the reasoning feels arbitrary or unjustified even if the words are understood.
+> * 4 — Severe gap: the section is nearly incomprehensible without prior knowledge not covered anywhere in the video.
+> * 5 — Critical gap: the entire point is inaccessible; the non-expert is completely lost.
+> Use severity 3 when a non-expert could repeat the words but could not explain why they are true or why they matter.
+>
 > You are given a rolling list of prerequisites already established earlier:
 > {{ESTABLISHED_PREREQUISITES_JSON}}
 > Treat it as ground truth and do NOT re-infer earlier context outside this list.
@@ -82,7 +90,7 @@ The LLM processes segments in **chunks** (windows), each chunk includes:
 > "marks": [
 > {
 > "id": <segment_id>,
-> "severity": 1,
+> "severity": <integer 1-5>,
 > "new_required_prerequisites": ["string (1-5)"],
 > "evidence": {
 > "not_established_before": ["string (1-3)"],
@@ -197,7 +205,7 @@ Add to `params`:
   "chunk_size": 15,
   "overlap": 3,
   "max_established": 200,
-  "model": "gpt-4o-mini",
+  "model": "gpt-5.2",
   "temperature": 0.0
 }
 ```
@@ -217,12 +225,13 @@ Cache each chunk request/response:
 
 * Use lowest possible temperature (e.g., `temperature = 0.0` or equivalent)
 * Fix `prompt_version` string and include it in cache key
-  * Current version: `v1.2` (fixed mark.id to use actual segment IDs)
+  * Current version: `v1.3` (added 5-level severity guide to user prompt)
   * When prompt logic changes, increment version to invalidate old cache
   * Version history:
     * `v1.0`: Initial implementation
     * `v1.1`: Updated for chunk_size=15 and micro_suggestion fix
     * `v1.2`: Fixed mark.id to use actual segment IDs instead of local indices
+    * `v1.3`: Added severity guide (integer 1-5 with descriptions) to user prompt template
 * Enforce JSON-only output (reject and retry if invalid)
 
 ### B6.3 Retry policy

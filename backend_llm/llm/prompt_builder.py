@@ -27,6 +27,14 @@ Definitions:
 * "Missing prerequisite" must be a concrete concept/assumption (avoid vague labels like "more detail").
 * A "change point" is the FIRST segment where the new prerequisite becomes required.
 
+Severity guide (integer 1-5):
+* 1 — Minor gap: an unfamiliar term or single concept; a non-expert can still follow the overall flow.
+* 2 — Moderate gap: a missing concept causes noticeable confusion, but the gist of the section can still be inferred.
+* 3 — Significant gap: the missing prerequisite is necessary to understand WHY the conclusion or next step holds; without it the reasoning feels arbitrary or unjustified even if the words are understood.
+* 4 — Severe gap: the section is nearly incomprehensible without prior knowledge not covered anywhere in the video.
+* 5 — Critical gap: the entire point is inaccessible; the non-expert is completely lost.
+Use severity 3 when a non-expert could repeat the words but could not explain why they are true or why they matter.
+
 You are given a rolling list of prerequisites already established earlier:
 {established_prerequisites_json}
 Treat it as ground truth and do NOT re-infer earlier context outside this list.
@@ -36,7 +44,7 @@ Output JSON only. Schema:
   "marks": [
     {{
       "id": <segment_id>,
-      "severity": 1,
+      "severity": <integer 1-5>,
       "new_required_prerequisites": ["string (1-5)"],
       "evidence": {{
         "not_established_before": ["string (1-3)"],
